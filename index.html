@@ -1,17 +1,17 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
 <title></title>
 </head><body>
-<h1>トラステッド クローク</h1>
+<h1>信頼できるデジタルクローク - TrustedCloak</h1>
 
 <script type="module" src="https://code4fukui.github.io/qr-code-reader/qr-code-reader.js"></script>
 
 <main>
   <div>預かり番号: <input type="text" id="cloakno"></div>
-  <div><button id=btnmake>預かりQRコード発行</button></div>
+  <div><button id=btnmake>預かり証明書発行</button></div>
   <div id=qrcode></div>
   <hr>
   <div>検証済み 預かり番号: <span id=cloakno2></span></div>
-  <div>検証済み 預かり時刻: <span id=cloaktime2></span></div>
+  <div>検証済み 預かり日時: <span id=cloaktime2></span></div>
   <qr-code-reader id=qrreader></qr-code-reader>
   <hr>
   <div>クロークの公開鍵: <div id=pubkey></div><button id=btnreset>公開鍵秘密鍵リセット</button></div>
