@@ -71,7 +71,7 @@ btnmake.onclick = () => {
   const message = no + "," + new DateTime().toString();
   console.log(message);
   const sign = sec.sign(keys.prikey, new TextEncoder().encode(message));
-  const baseurl = "https://code4fukui.github.io/turstedcloak/qr.html";
+  const baseurl = "https://code4fukui.github.io/TrustedCloak/qr.html";
   const url = baseurl + "#" + message + "," + Base16.encode(sign);
   console.log(url);
   
