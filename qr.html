@@ -1,0 +1,36 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title>預り証明書</title>
+</head><body>
+<h1>預り証明書</h1>
+<script type="module" src="https://js.sabae.cc/QRCode.js"></script>
+
+<main>
+<qr-code></qr-code>
+<div>預かり番号: <span id=no></span></div>
+<div>預かり日時: <span id=time></span></div>
+<div>電子署名: <span id=sign></span></div>
+<div>預かり証明書は電子署名により偽造できません。この画面をスクリーンキャプチャーしたり、ブックマークして保存してください。このデータ無くすると受け取れなくなります。第三者に渡すと受け取られてしまいます。</div>
+</main>
+<hr>
+<a href=https://github.com/code4fukui/TrustedCloak>src on GitHub</a><br>
+
+<script type="module">
+const data = location.hash.substring(1).split(",");
+no.textContent = data[0];
+time.textContent = data[1];
+sign.textContent = data[2];
+</script>
+
+<style>
+body {
+  text-align: center;
+}
+main > * {
+  margin: 1em 0;
+}
+#sign {
+  font-size: 80%;
+  word-wrap: break-word;
+}
+</style>
+</body>

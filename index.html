@@ -1,0 +1,101 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><link rel="icon" href="data:">
+<title></title>
+</head><body>
+<h1>トラステッド クローク</h1>
+
+<script type="module" src="https://code4fukui.github.io/qr-code-reader/qr-code-reader.js"></script>
+
+<main>
+  <div>預かり番号: <input type="text" id="cloakno"></div>
+  <div><button id=btnmake>預かりQRコード発行</button></div>
+  <div id=qrcode></div>
+  <hr>
+  <div>検証済み 預かり番号: <span id=cloakno2></span></div>
+  <div>検証済み 預かり時刻: <span id=cloaktime2></span></div>
+  <qr-code-reader id=qrreader></qr-code-reader>
+  <hr>
+  <div>クロークの公開鍵: <div id=pubkey></div><button id=btnreset>公開鍵秘密鍵リセット</button></div>
+</main>
+
+<style>
+main > * {
+  margin: 1em 0;
+}
+</style>
+
+
+<script type="module">
+import * as sec from "https://code4fukui.github.io/sec.js/sec.js";
+import { Base16 } from "https://code4fukui.github.io/Base16/Base16.js";
+import { subbin, bincat } from "https://js.sabae.cc/binutil.js";
+import { QRCode } from "https://js.sabae.cc/QRCode.js";
+import { DateTime } from "https://js.sabae.cc/DateTime.js";
+
+const genKeys = () => {
+  const prikey = sec.prikey();
+  const pubkey = sec.pubkey(prikey);
+  return { prikey, pubkey };
+};
+
+const getKeys = () => {
+  const keys = localStorage.getItem("keys");
+  if (keys) {
+    const prikey = Base16.decode(keys);
+    const pubkey = subbin(prikey, 32, 32);
+    return { prikey, pubkey };
+  }
+  const k = genKeys();
+  localStorage.setItem("keys", Base16.encode(bincat(k.prikey, k.pubkey)));
+  return k;
+};
+
+const keys = getKeys();
+pubkey.textContent = Base16.encode(keys.pubkey);
+console.log(keys);
+
+btnreset.onclick = () => {
+  if (confirm("リセットすると発行済のQRコードを検証できなくなります。よろしいですか？")) {
+    localStorage.removeItem("keys");
+    location.reload();
+  }
+};
+
+cloakno.value = localStorage.getItem("clockno") || 1;
+btnmake.onclick = () => {
+  const no = parseInt(cloakno.value);
+  if (isNaN(no)) {
+    alert("預かり番号が番号ではないので発行できません");
+    return;
+  }
+
+  const message = no + "," + new DateTime().toString();
+  console.log(message);
+  const sign = sec.sign(keys.prikey, new TextEncoder().encode(message));
+  const baseurl = "https://code4fukui.github.io/turstedcloak/qr.html";
+  const url = baseurl + "#" + message + "," + Base16.encode(sign);
+  console.log(url);
+  
+  qrcode.innerHTML = "";
+  qrcode.appendChild(new QRCode(url));
+
+  cloakno.value = no + 1;
+  localStorage.setItem("clockno", cloakno.value);
+};
+
+qrreader.oninput = (e) => {
+  const url = e.data;
+  const data = url.substring(url.indexOf("#") + 1).split(",");
+  const sign = Base16.decode(data[data.length - 1]);
+  data.pop();
+  const message = new TextEncoder().encode(data.join(","));
+  if (sec.verify(sign, keys.pubkey, message)) {
+    cloakno2.textContent = data[0];
+    cloaktime2.textContent = data[1];
+  } else {
+    cloakno2.textContent = "検証できませんでした";
+    cloaktime2.textContent = "";
+  }
+};
+</script>
+
+</body></html>
